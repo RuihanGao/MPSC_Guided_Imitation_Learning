@@ -61,10 +61,13 @@ class NeuralNetwork:
         self.dataset = None
 
     def data_process(self, X = None, Y = None, paths = None):
+        print("paths")
+        print(paths)
         if paths is not None:
             X = []
             Y = []
             for path in paths:
+                print("path", path)
                 X_, Y_ = pickle.load(open(path, 'rb'))
                 X = X + X_
                 Y = Y + Y_
@@ -73,12 +76,32 @@ class NeuralNetwork:
 
         self.dataset = data_utils.TensorDataset(torch.from_numpy(np.asarray(X)), torch.from_numpy(np.asarray(Y)))
 
+    def mpc(self, X = None, Y = None, paths = None):
+        print("paths")
+        print(paths)
+        if paths is not None:
+            X = []
+            Y = []
+            for path in paths:
+                print("path", path)
+                X_, Y_ = pickle.load(open('mpc_safe_traj/'+path, 'rb'))
+                X = X + X_
+                Y = Y + Y_
+        print(len(X))
+        print(type(X))
+        print(type(np.asarray(X)))
+        print("X[0]")
+        print(X[0])
+        print("convert to TensorDataset")
+#         x = torch.Tensor(list(X_train.values))
+        self.dataset = data_utils.TensorDataset(torch.from_numpy(np.asarray(X)), torch.from_numpy(np.asarray(Y)))
+
     def train(self, checkpoint = None, num_epoch = 100):
         epoch_init = 0
         if checkpoint is not None:
             checkpoint = torch.load(checkpoint)
             self.model.load_state_dict(checkpoint['model_state_dict'])
-            optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             epoch_init = checkpoint['epoch'] + 1
             loss = checkpoint['loss']
             self.model.eval()
